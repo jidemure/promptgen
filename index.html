@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stop-motion creature prompt</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&display=swap">
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#1e2a33;--mute:#5d6b76;--line:#d3dae0;--glue:#f2a900;--glue-ink:#2a1d00;--box:#f6f8fa;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12181d;--card:#1b2329;--ink:#e8edf0;--mute:#93a1ab;--line:#2f3a42;--box:#151c21}}
+:root[data-theme="dark"]{--bg:#12181d;--card:#1b2329;--ink:#e8edf0;--mute:#93a1ab;--line:#2f3a42;--box:#151c21}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 100px}
+h1{font-size:1.6rem;line-height:1.15;margin:8px 0 6px}
+p.sub{margin:0 0 18px;color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+label{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:.95rem;margin-bottom:6px}
+label small{font-weight:500;color:var(--mute)}
+input{width:100%;font:inherit;color:var(--ink);background:var(--box);border:1px solid var(--line);border-radius:10px;padding:12px}
+input:focus-visible,button:focus-visible{outline:3px solid var(--glue);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;max-height:132px;overflow-y:auto;padding:2px}
+.chip{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--box);color:var(--ink);border-radius:99px;padding:5px 11px;cursor:pointer}
+.chip.on{background:var(--glue);border-color:var(--glue);color:var(--glue-ink);font-weight:700}
+.none{color:var(--mute);font-size:.85rem;padding:4px}
+.surprise{width:100%;font:700 1rem inherit;font-family:inherit;border:1px dashed var(--mute);background:transparent;color:var(--ink);border-radius:12px;padding:12px;margin-bottom:14px;cursor:pointer}
+pre{white-space:pre-wrap;word-break:break-word;margin:0;font:.86rem/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+.ph{background:rgba(242,169,0,.28);border-radius:4px;padding:0 3px;font-weight:700}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.bar button{display:block;width:100%;max-width:608px;margin:0 auto;font:700 1.05rem inherit;font-family:inherit;border:0;border-radius:12px;padding:15px;background:var(--glue);color:var(--glue-ink);cursor:pointer}
+.bar button.done{background:#2e9e5b;color:#fff}
+</style>
+</head>
+<body>
+<main>
+<h1>Stop-motion creature prompt</h1>
+<p class="sub">Pick from the lists or type your own. The finished sculpture then comes alive with the animation you choose.</p>
+<div id="fields"></div>
+<button class="surprise" id="rnd" type="button">Surprise me</button>
+<div class="card"><pre id="out"></pre></div>
+</main>
+<div class="bar"><button id="copy" type="button">Copy prompt</button></div>
+
+<script>
+(function(){
+var animals="Meerkat,Fox,Red panda,Owl,Penguin,Elephant,Giraffe,Lion,Tiger,Panda,Koala,Kangaroo,Sloth,Hedgehog,Squirrel,Rabbit,Deer,Wolf,Bear,Polar bear,Raccoon,Otter,Beaver,Capybara,Llama,Alpaca,Horse,Zebra,Rhinoceros,Hippopotamus,Gorilla,Orangutan,Chimpanzee,Lemur,Monkey,Cat,Dog,Pug,Corgi,Pig,Cow,Sheep,Goat,Duck,Chicken,Rooster,Swan,Flamingo,Peacock,Parrot,Toucan,Eagle,Hummingbird,Pelican,Puffin,Kiwi bird,Dodo,Turtle,Tortoise,Crocodile,Chameleon,Gecko,Iguana,Komodo dragon,Frog,Axolotl,Salamander,Snake,Cobra,Dolphin,Whale,Orca,Seal,Walrus,Manatee,Shark,Octopus,Seahorse,Jellyfish,Crab,Lobster,Starfish,Pufferfish,Clownfish,Narwhal,Butterfly,Bee,Ladybug,Dragonfly,Beetle,Praying mantis,Ant,Snail,Spider,Scorpion,Grasshopper,Armadillo,Pangolin,Aardvark,Anteater,Platypus,Echidna,Tasmanian devil,Wombat,Quokka,Fennec fox,Arctic fox,Snow leopard,Cheetah,Leopard,Jaguar,Lynx,Hyena,Warthog,Okapi,Tapir,Moose,Bison,Yak,Camel,Mongoose,Meerkat pup,Honey badger,Skunk,Porcupine,Bat,Mole,Chinchilla,Guinea pig,Hamster,Ferret,Sugar glider,Binturong,Saiga antelope,Maned wolf,Shoebill,Secretary bird,Blobfish,Dragon,Unicorn,Phoenix".split(",");
+var mats="Groundnut shell,Walnut shell,Pistachio shell,Almond shell,Coconut shell,Pine cone,Dried corn husk,Corn cob,Rice straw,Wheat straw,Dried leaves,Fallen twigs,Bark,Acorn caps,Seed pods,Sunflower seeds,Pumpkin seeds,Coffee beans,Used coffee grounds,Tea bags,Egg shells,Egg carton,Cardboard,Cereal box,Toilet paper rolls,Newspaper,Magazine pages,Paper cups,Straws,Plastic bottle caps,Plastic bottles,Bubble wrap,Bread tags,Plastic spoons,Disposable forks,Ice cream sticks,Popsicle sticks,Matchsticks,Toothpicks,Chopsticks,Cotton buds,Cotton balls,Old buttons,Zippers,Wire hangers,Paper clips,Binder clips,Rubber bands,Soda can tabs,Aluminum cans,Tin cans,Foil scraps,Keys,Old coins,Nuts and bolts,Screws,Washers,Springs,Nails,Gears from old watches,Watch parts,Circuit boards,Computer keys,Cables and wires,Old CDs,Cassette tape,Film reels,Corks,Wine corks,Sponges,Scouring pads,Denim scraps,Yarn scraps,Felt scraps,Lace trims,Old socks,Wool scraps,Fabric scraps,Leather scraps,Seashells,Driftwood,Pebbles,Sea glass,Sand dollars,Fish bones,Dried orange peel,Banana peel,Dried citrus slices,Cinnamon sticks,Star anise,Dried pasta,Rice grains,Lentils,Dried beans,Cashew shells,Pecan shells,Hazelnut shells,Chestnut husks,Bamboo scraps,Wood shavings,Sawdust,Broken pottery,Dried flowers,Cork bark,Lollipop sticks,Crayon stubs,Pencil shavings,Erasers,Broken pencils,Lego-free toy bricks,Tetra Pak cartons,Candy wrappers,Chip bags,Egg tray pulp".split(",");
+var anims="does a happy dance,breakdances,moonwalks,does the robot dance,waltzes in a slow circle,tap dances,does a ballet pirouette,salsa dances,does the floss dance,hip-hop bounces to the beat,shuffles in a conga line,strikes a disco pose,headbangs like a rock star,tangos,does the macarena,does the twist,does the Charleston,shimmies,does jazz hands,jumps for joy,spins like a top,does a cartwheel,flips backward,does a somersault,waves hello,bows politely,claps along,marches like a soldier,skips along,sneaks on tiptoe,runs in place,takes a victory lap,stretches and yawns,shakes itself like it just got wet,peeks around and hides,sniffs the air,stands guard like a sentry,flexes its muscles,plays air guitar,conducts an invisible orchestra,hops excitedly,rolls over,does a yoga pose,strikes karate poses,shadow boxes,sneezes tiny,falls asleep and snores,blows a kiss,pretends to fly,looks at its reflection and poses,tilts its head curiously,wiggles its tail happily,bounces like on a trampoline,stomps to a drum beat,sways like on a boat,gets startled and jumps,laughs and holds its belly,does a slow-motion hero pose".split(",");
+
+var F=[
+ {k:"A",label:"Animal",ph:"[ANIMAL]",list:animals,hint:"e.g. Meerkat",v:"Meerkat"},
+ {k:"M",label:"Waste material",ph:"[MATERIAL]",list:mats,hint:"e.g. groundnut shell",v:"Groundnut shell"},
+ {k:"N",label:"Animation",ph:"[ANIMATION]",list:anims,hint:"e.g. does a happy dance",v:"does a happy dance"}
+];
+var T="Photorealistic macro stop-motion video, one continuous locked-off shot. Human hands craft a tiny {A} entirely from {M}, joined with a hot glue gun, on a clean white paper surface.\n\nBUILD: The work begins as a rough skeleton of {M} pieces and grows piece by piece into a highly detailed miniature: body, limbs, head, then the finishing details. Every piece keeps the authentic texture, color, grain, cracks and imperfections of {M}. Glue seams and thin glue strings stay visible, as in real handcraft. Add realistic eyes and natural details true to the anatomy of a {A}.\n\nLIFE-LIKE ANIMATION: When the sculpture is finished, the hands move away. The {A} sculpture comes gently alive in a charming stop-motion style: it blinks, turns its head, then {N}, and finally settles back into a calm pose. Movement is slightly stepped, like real frame-by-frame animation, with soft natural physics and its balance kept believable. The body stays made of {M} the whole time: no morphing, no fur, no skin, no material change. The video ends with the sculpture standing on a wooden desk while a hand gently touches it.\n\nLOOK: Realistic hands, materials, shadows, physics and continuous scale. Warm natural daylight, softly blurred children's playroom with colorful toys in the background, shallow depth of field, cinematic macro photography, realistic bokeh, tactile handcrafted detail.\n\nNEGATIVE: No cartoon look, CGI appearance, warped hands, extra fingers, floating objects, flickering, inconsistent anatomy, text or watermarks.\n\nABSOLUTE RULE: {M} controls the entire visual identity and construction of the {A}. Do not substitute, mix or invent any other material.";
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function val(k){var f=F.filter(function(x){return x.k===k})[0];var v=f.v.trim();return v||f.ph}
+function build(html){
+  var t=html?esc(T):T;
+  return t.replace(/\{([AMN])\}/g,function(_,k){var v=val(k);return html?'<span class="ph">'+esc(v)+'</span>':v});
+}
+var out=document.getElementById("out");
+function render(){out.innerHTML=build(true)}
+var box=document.getElementById("fields");
+F.forEach(function(f){
+  var card=document.createElement("div");card.className="card";
+  var lab=document.createElement("label");lab.setAttribute("for","f"+f.k);
+  lab.innerHTML=esc(f.label)+"<small>"+f.list.length+" options</small>";
+  var inp=document.createElement("input");inp.id="f"+f.k;inp.placeholder=f.hint;inp.value=f.v;inp.autocomplete="off";
+  var chips=document.createElement("div");chips.className="chips";
+  function draw(){
+    var q=inp.value.trim().toLowerCase();chips.innerHTML="";
+    var m=f.list.filter(function(x){return !q||x.toLowerCase().indexOf(q)>-1});
+    if(!m.length){chips.innerHTML='<span class="none">No match. Your own text will be used.</span>';return}
+    m.forEach(function(x){
+      var b=document.createElement("button");b.type="button";b.className="chip"+(x.toLowerCase()===q?" on":"");b.textContent=x;
+      b.onclick=function(){f.v=x;inp.value=x;draw();render()};chips.appendChild(b);
+    });
+  }
+  inp.addEventListener("input",function(){f.v=inp.value;draw();render()});
+  f.set=function(x){f.v=x;inp.value=x;draw()};
+  card.appendChild(lab);card.appendChild(inp);card.appendChild(chips);box.appendChild(card);
+  draw();
+});
+document.getElementById("rnd").onclick=function(){
+  F.forEach(function(f){f.set(f.list[Math.floor(Math.random()*f.list.length)])});render();
+};
+var btn=document.getElementById("copy");
+function fallback(t){var x=document.createElement("textarea");x.value=t;x.style.position="fixed";x.style.opacity="0";document.body.appendChild(x);x.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(x)}
+btn.addEventListener("click",function(){
+  var t=build(false);
+  function ok(){btn.textContent="Copied";btn.classList.add("done");setTimeout(function(){btn.textContent="Copy prompt";btn.classList.remove("done")},1600)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){fallback(t);ok()})}else{fallback(t);ok()}
+});
+render();
+})();
+</script>
+</body>
+</html>
